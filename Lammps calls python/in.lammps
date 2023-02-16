@@ -1,0 +1,56 @@
+units metal
+boundary p p p
+atom_style atomic
+neighbor 2.0 bin
+neigh_modify every 1
+
+
+python randomStructure input 2 45.0 45.0 format ff file kMC_maBN.py
+python randomStructure invoke
+
+compute tmp all pe
+
+read_data BN.data
+
+pair_style extep
+pair_coeff * * ../BN.extep B N
+
+thermo     1
+thermo_style custom step pe temp c_tmp
+minimize 1.0e-7 1.0e-10 1000 10000
+write_data relaxed.data
+run 0
+
+variable E_new equal c_tmp
+variable E python kmc
+python kmc input 3 v_E_new 0.0 0 return v_E format ffif file kMC_maBN.py
+variable E_old equal ${E}
+
+label      loop
+variable   i loop 200000
+
+clear
+
+units metal
+boundary p p p
+atom_style atomic
+neighbor 2.0 bin
+neigh_modify every 1
+compute tmp all pe
+read_data BN.data
+pair_style deepmd ../1029c.pb
+pair_coeff * *
+thermo     1
+thermo_style custom step pe temp c_tmp
+minimize 1.0e-7 1.0e-10 1000 10000
+write_data relaxed.data
+run 0
+variable E python kmc
+variable E_new equal c_tmp
+python kmc input 3 v_E_new v_E_old v_i return v_E format ffif file kMC_maBN.py
+variable E_old equal ${E}
+
+next i 
+jump SELF loop
+label      break
+quit
