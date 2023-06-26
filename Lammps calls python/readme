@@ -2,6 +2,6 @@ To avoid hundreds of thousands of initiation procedure of LAMMPS, we tried to us
 In this way,  you can use `lmp -i in.lammps` to finish all simulation with only one launch of LAMMPS, which will reduce the conputaion time effectively.
 In addition, if you want to run LAMMPS with MPI, you need to add several lines of code in `kMC_maBN.py` to avoid multiple calls of PYTHON
 
-But for some interatomic potential, the `clear` commands cannot clear all the data in memoriy, as a result, there will be OOM issue after finite loops.
+But for some interatomic potential, the `clear` commands cannot clear all the data in memory, as a result, there will be OOM issue after finite loops.
 If we want to do a long time simulation, we need to restart the LAMMPS constantly to continue the simulation when the job killed by OOM.
 So we use the `in.resume.bak` as the restart input file, when the previous job get killed, `run.sh` will copy the `in.resume.bak` to `in.resume`, and reset the MC steps in `in.resume.bak` to continume the job
